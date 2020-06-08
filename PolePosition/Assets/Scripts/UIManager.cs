@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using Mirror;
+﻿using Mirror;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,6 +7,7 @@ public class UIManager : MonoBehaviour
     public bool showGUI = true;
 
     private NetworkManager m_NetworkManager;
+    public string playerName;
 
     [Header("Main Menu")] [SerializeField] private GameObject mainMenu;
     [SerializeField] private Button buttonHost;
@@ -17,12 +15,21 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Button buttonServer;
     [SerializeField] private InputField inputFieldIP;
 
-    [Header("In-Game HUD")] [SerializeField]
+    [Header("In-Game HUD")]
+    [SerializeField]
     private GameObject inGameHUD;
 
     [SerializeField] private Text textSpeed;
     [SerializeField] private Text textLaps;
     [SerializeField] private Text textPosition;
+
+    [Header("Login Menu")]
+    [SerializeField] GameObject loginMenu;
+    [SerializeField] InputField nameInput;
+
+    [Header("Chat Menu")]
+    [SerializeField] GameObject chatMenu;
+    public Mirror.Examples.Chat.Player player;
 
     private void Awake()
     {
@@ -34,7 +41,8 @@ public class UIManager : MonoBehaviour
         buttonHost.onClick.AddListener(() => StartHost());
         buttonClient.onClick.AddListener(() => StartClient());
         buttonServer.onClick.AddListener(() => StartServer());
-        ActivateMainMenu();
+        buttonServer.onClick.AddListener(() => SetPlayer());
+        ActivateLoginMenu();
     }
 
     public void UpdateSpeed(int speed)
@@ -42,34 +50,38 @@ public class UIManager : MonoBehaviour
         textSpeed.text = "Speed " + speed + " Km/h";
     }
 
-    private void ActivateMainMenu()
+    private void ActivateLoginMenu()
     {
-        mainMenu.SetActive(true);
-        inGameHUD.SetActive(false);
-    }
-
-    private void ActivateInGameHUD()
-    {
+        loginMenu.SetActive(true);
         mainMenu.SetActive(false);
-        inGameHUD.SetActive(true);
+        inGameHUD.SetActive(false);
+        chatMenu.SetActive(false);
     }
 
     private void StartHost()
     {
         m_NetworkManager.StartHost();
-        ActivateInGameHUD();
     }
 
     private void StartClient()
     {
         m_NetworkManager.StartClient();
         m_NetworkManager.networkAddress = inputFieldIP.text;
-        ActivateInGameHUD();
     }
 
     private void StartServer()
     {
         m_NetworkManager.StartServer();
-        ActivateInGameHUD();
+    }
+
+    public void SetPlayer()
+    {
+        player = NetworkClient.connection.identity.GetComponent<Mirror.Examples.Chat.Player>();
+        player.playerName = playerName;
+    }
+
+    public void GetPlayerName()
+    {
+        playerName = nameInput.text;
     }
 }

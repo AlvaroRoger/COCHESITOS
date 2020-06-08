@@ -34,7 +34,8 @@ namespace Mirror.Examples.Chat
             Player player = NetworkClient.connection.identity.GetComponent<Player>();
 
             // send a message
-            player.CmdSend(chatMessage.text.Trim());
+            if (player) player.CmdSend(chatMessage.text.Trim());
+            else Debug.LogError("No player!");
 
             chatMessage.text = "";
         }
